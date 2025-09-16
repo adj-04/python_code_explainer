@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Python Code Explainer</title>
+</head>
+<body>
+  <h1>Python Code Explainer</h1>
+
+  <!-- Input area for Python code -->
+  <textarea id="codeInput" rows="10" cols="50" placeholder="Paste your Python code here..."></textarea><br><br>
+  <button onclick="explainCode()">Explain Code</button>
+
+  <h2>Explanation:</h2>
+
+  <!-- Output area as a textarea -->
+  <textarea id="output" rows="10" cols="50" readonly></textarea>
+
+  <script>
+    async function explainCode() {
+      const code = document.getElementById("codeInput").value;
+
+      try {
+        const response = await fetch("http://localhost:5000/explain", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code })
+        });
+
+        const data = await response.json();
+
+        // Update the output textarea
+        document.getElementById("output").value = data.explanation || data.error;
+
+      } catch (err) {
+        document.getElementById("output").value = "Error connecting to backend: " + err;
+      }
+    }
+  </script>
+</body>
+</html>

@@ -1,0 +1,16 @@
+services:
+  backend:
+    image: adj004/backend:latest
+    container_name: backend
+    ports:
+      - "5000:5000"
+    env_file:
+      - ./backend/.env
+
+  frontend:
+    image: adj004/frontend:latest
+    container_name: frontend
+    ports:
+      - "8080:80"
+    depends_on:
+      - backend
