@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pythonic — Code Explainer</title>
+  <style>
+    :root {
+      --bg: #0a0a0a;
+      --panel: #131313;
+      --panel-2: #0e0e0e;
+      --border: #262626;
+      --border-hover: #3a3a3a;
+      --text: #f2f2f2;
+      --muted: #8a8a8a;
+      --yellow: #f5c518;
+      --yellow-soft: rgba(245, 197, 24, 0.12);
+      --yellow-hover: #ffd83d;
+      --error: #ff6b6b;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-height: 100vh;
+      background:
+        radial-gradient(circle at 15% 0%, rgba(245, 197, 24, 0.06), transparent 40%),
+        var(--bg);
+      color: var(--text);
+      font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+      display: flex;
+      justify-content: center;
+      padding: 56px 20px;
+    }
+    .container { width: 100%; max-width: 880px; }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 6px;
+    }
+    .brand-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--yellow);
+      box-shadow: 0 0 12px var(--yellow);
+    }
+    .brand-name {
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    h1 {
+      font-size: 2.1rem;
+      margin: 4px 0 8px;
+      letter-spacing: -0.02em;
+    }
+    h1 span { color: var(--yellow); }
+
+    p.subtitle {
+      color: var(--muted);
+      margin: 0 0 32px;
+      font-size: 1rem;
+      line-height: 1.5;
+      max-width: 560px;
+    }
+
+    .panel {
+      background: linear-gradient(180deg, var(--panel), var(--panel-2));
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px;
+      margin-bottom: 18px;
+      transition: border-color 0.2s ease;
+    }
+    .panel:hover { border-color: var(--border-hover); }
+
+    .panel-label {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+    }
+    label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      font-weight: 600;
+    }
+    .char-count { font-size: 0.75rem; color: var(--muted); }
+
+    textarea {
+      width: 100%;
+      background: #000;
+      color: var(--text);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 14px;
+      font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
+      font-size: 0.9rem;
+      line-height: 1.5;
+      resize: vertical;
+      min-height: 220px;
+      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+    }
+    textarea:focus {
+      outline: none;
+      border-color: var(--yellow);
+      box-shadow: 0 0 0 3px var(--yellow-soft);
+    }
+    #output {
+      min-height: 180px;
+      white-space: pre-wrap;
+      font-family: "Inter", -apple-system, sans-serif;
+      color: #e8e8e8;
+    }
+    #output::placeholder { color: var(--muted); }
+
+    .actions {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      margin-top: 14px;
+    }
+    button {
+      background: var(--yellow);
+      color: #101010;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 22px;
+      font-weight: 700;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      transition: background 0.15s ease, transform 0.1s ease;
+    }
+    button:hover:not(:disabled) { background: var(--yellow-hover); transform: translateY(-1px); }
+    button:active:not(:disabled) { transform: translateY(0); }
+    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+
+    .spinner {
+      width: 14px;
+      height: 14px;
+      border: 2px solid rgba(16,16,16,0.3);
+      border-top-color: #101010;
+      border-radius: 50%;
+      animation: spin 0.7s linear infinite;
+      display: none;
+    }
+    button.loading .spinner { display: inline-block; }
+    button.loading .btn-text { display: none; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .status {
+      font-size: 0.85rem;
+      color: var(--muted);
+      transition: color 0.15s ease;
+    }
+    .status.error { color: var(--error); }
+    .status.ok { color: var(--yellow); }
+
+    .hint {
+      font-size: 0.78rem;
+      color: var(--muted);
+      margin-top: 20px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="brand">
+      <span class="brand-dot"></span>
+      <span class="brand-name">Pythonic</span>
+    </div>
+    <h1>Paste code. Get it <span>explained.</span></h1>
+    <p class="subtitle">
+      Drop in any Python snippet and get a plain-English walkthrough —
+      no jargon, no guesswork, just what your code is actually doing.
+    </p>
+
+    <div class="panel">
+      <div class="panel-label">
+        <label for="codeInput">Your code</label>
+        <span class="char-count" id="charCount">0 / 8000</span>
+      </div>
+      <textarea id="codeInput" placeholder="def add(a, b):&#10;    return a + b" spellcheck="false"></textarea>
+      <div class="actions">
+        <button id="explainBtn" onclick="explainCode()">
+          <span class="spinner"></span>
+          <span class="btn-text">Explain it</span>
+        </button>
+        <span id="status" class="status"></span>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-label">
+        <label for="output">Explanation</label>
+      </div>
+      <textarea id="output" readonly placeholder="Your explanation will show up here..."></textarea>
+    </div>
+
+    <p class="hint">Only valid Python is accepted — this keeps things fast and on-topic.</p>
+  </div>
+
+  <script>
+    const API_BASE = window.API_BASE_URL || `${window.location.protocol}//${window.location.hostname}:5000`;
+    const MAX_LEN = 8000;
+
+    const btn = document.getElementById("explainBtn");
+    const status = document.getElementById("status");
+    const output = document.getElementById("output");
+    const codeInput = document.getElementById("codeInput");
+    const charCount = document.getElementById("charCount");
+
+    codeInput.addEventListener("input", () => {
+      const len = codeInput.value.length;
+      charCount.textContent = `${len} / ${MAX_LEN}`;
+      charCount.style.color = len > MAX_LEN ? "#ff6b6b" : "";
+    });
+
+    async function explainCode() {
+      const code = codeInput.value.trim();
+      output.value = "";
+      status.textContent = "";
+      status.classList.remove("error", "ok");
+
+      if (!code) {
+        status.textContent = "Paste some code first.";
+        status.classList.add("error");
+        return;
+      }
+
+      btn.disabled = true;
+      btn.classList.add("loading");
+      status.textContent = "Reading through it...";
+
+      try {
+        const response = await fetch(`${API_BASE}/explain`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ code })
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          if (response.status === 422) {
+            status.textContent = data.error || "That doesn't look like valid Python.";
+          } else if (response.status === 429) {
+            status.textContent = data.error || "Slow down a little — rate limit reached.";
+          } else {
+            status.textContent = data.error || `Something went wrong (${response.status}).`;
+          }
+          status.classList.add("error");
+          return;
+        }
+
+        output.value = data.explanation || "No explanation returned.";
+        status.textContent = "Done.";
+        status.classList.add("ok");
+      } catch (err) {
+        status.textContent = "Couldn't reach the backend: " + err.message;
+        status.classList.add("error");
+      } finally {
+        btn.disabled = false;
+        btn.classList.remove("loading");
+      }
+    }
+
+    codeInput.addEventListener("keydown", (e) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") explainCode();
+    });
+  </script>
+</body>
+</html>
