@@ -9,6 +9,8 @@ import threading
 from datetime import date
 from dotenv import load_dotenv
 
+import analyzer  # local, offline AST analysis — no API calls, no quota impact
+
 load_dotenv()
 
 logging.basicConfig(level=logging.INFO)
@@ -163,6 +165,129 @@ def explain_code():
     except Exception as e:
         logger.exception("Groq API call failed")
         return jsonify({"error": f"Groq API error: {str(e)}"}), 500
+
+
+def _get_validated_code():
+    """Shared input handling for the local-analysis endpoints.
+    Returns (code_text, error_response_or_None).
+    These endpoints never call Groq and never touch the daily quota."""
+    data = request.get_json(silent=True)
+    if not data or "code" not in data:
+        return None, (jsonify({"error": "No code provided. Send JSON: {\"code\": \"...\"}"}), 400)
+
+    code_text = data.get("code", "").strip()
+    if not code_text:
+        return None, (jsonify({"error": "Empty code provided"}), 400)
+
+    if len(code_text) > MAX_CODE_LENGTH:
+        return None, (jsonify({
+            "error": f"Code too long ({len(code_text)} chars). "
+                     f"Max allowed is {MAX_CODE_LENGTH} characters."
+        }), 413)
+
+    return code_text, None
+
+
+# --- Local analysis endpoints -------------------------------------------
+# None of these call Groq or touch the daily API quota. They run entirely
+# on Python's built-in `ast` module, so they're free to use as often as
+# needed and work even when USE_GROQ is disabled.
+
+@app.route("/flowchart", methods=["POST"])
+@limiter.limit(RATE_LIMIT)
+def flowchart():
+    code_text, err = _get_validated_code()
+    if err:
+        return err
+    try:
+        result = analyzer.generate_flowchart(code_text)
+        return jsonify(result)
+    except analyzer.AnalysisError as e:
+        return jsonify({"error": str(e)}), 422
+    except Exception as e:
+        logger.exception("Flowchart generation failed")
+        return jsonify({"error": f"Could not analyze code: {e}"}), 500
+
+
+@app.route("/issues", methods=["POST"])
+@limiter.limit(RATE_LIMIT)
+def issues():
+    code_text, err = _get_validated_code()
+    if err:
+        return err
+    try:
+        result = analyzer.detect_issues(code_text)
+        return jsonify({"issues": result})
+    except analyzer.AnalysisError as e:
+        return jsonify({"error": str(e)}), 422
+    except Exception as e:
+        logger.exception("Issue detection failed")
+        return jsonify({"error": f"Could not analyze code: {e}"}), 500
+
+
+@app.route("/complexity", methods=["POST"])
+@limiter.limit(RATE_LIMIT)
+def complexity():
+    code_text, err = _get_validated_code()
+    if err:
+        return err
+    try:
+        result = analyzer.compute_complexity(code_text)
+        return jsonify({"complexity": result})
+    except analyzer.AnalysisError as e:
+        return jsonify({"error": str(e)}), 422
+    except Exception as e:
+        logger.exception("Complexity analysis failed")
+        return jsonify({"error": f"Could not analyze code: {e}"}), 500
+
+
+@app.route("/explain-local", methods=["POST"])
+@limiter.limit(RATE_LIMIT)
+def explain_local():
+    """Rule-based, line-by-line explanation. No Groq call, no quota impact."""
+    code_text, err = _get_validated_code()
+    if err:
+        return err
+    try:
+        result = analyzer.explain_line_by_line(code_text)
+        return jsonify(result)
+    except analyzer.AnalysisError as e:
+        return jsonify({"error": str(e)}), 422
+    except Exception as e:
+        logger.exception("Local explain failed")
+        return jsonify({"error": f"Could not analyze code: {e}"}), 500
+
+
+@app.route("/optimize", methods=["POST"])
+@limiter.limit(RATE_LIMIT)
+def optimize():
+    code_text, err = _get_validated_code()
+    if err:
+        return err
+    try:
+        result = analyzer.suggest_optimizations(code_text)
+        return jsonify({"suggestions": result})
+    except analyzer.AnalysisError as e:
+        return jsonify({"error": str(e)}), 422
+    except Exception as e:
+        logger.exception("Optimization analysis failed")
+        return jsonify({"error": f"Could not analyze code: {e}"}), 500
+
+
+@app.route("/analyze", methods=["POST"])
+@limiter.limit(RATE_LIMIT)
+def analyze_all():
+    """Runs flowchart + issues + complexity + optimize in one call."""
+    code_text, err = _get_validated_code()
+    if err:
+        return err
+    try:
+        return jsonify(analyzer.full_report(code_text))
+    except analyzer.AnalysisError as e:
+        return jsonify({"error": str(e)}), 422
+    except Exception as e:
+        logger.exception("Full analysis failed")
+        return jsonify({"error": f"Could not analyze code: {e}"}), 500
 
 
 @app.errorhandler(429)

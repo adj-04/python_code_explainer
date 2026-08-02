@@ -10,180 +10,199 @@
       --panel: #131313;
       --panel-2: #0e0e0e;
       --border: #262626;
-      --border-hover: #3a3a3a;
+      --border-hover: #454545;
       --text: #f2f2f2;
       --muted: #8a8a8a;
       --yellow: #f5c518;
-      --yellow-soft: rgba(245, 197, 24, 0.12);
-      --yellow-hover: #ffd83d;
+      --yellow-soft: rgba(245, 197, 24, 0.10);
       --error: #ff6b6b;
+      --green: #33c17f;
+      --warn: #f5a524;
+      --info: #5b9bff;
+      --code-bg: #000;
     }
     * { box-sizing: border-box; }
     body {
       margin: 0;
       min-height: 100vh;
-      background:
-        radial-gradient(circle at 15% 0%, rgba(245, 197, 24, 0.06), transparent 40%),
-        var(--bg);
+      background: var(--bg);
       color: var(--text);
       font-family: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
       display: flex;
       justify-content: center;
       padding: 56px 20px;
     }
-    .container { width: 100%; max-width: 880px; }
+    /* Nothing except our own container may ever occupy body-level space —
+       guarantees no third-party or future script can shift the layout. */
+    body > *:not(.container) { display: none !important; }
 
-    .brand {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 6px;
-    }
-    .brand-dot {
-      width: 10px;
-      height: 10px;
-      border-radius: 50%;
-      background: var(--yellow);
-      box-shadow: 0 0 12px var(--yellow);
-    }
-    .brand-name {
-      font-size: 0.8rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      color: var(--muted);
-      font-weight: 600;
-    }
+    .container { width: 100%; max-width: 980px; }
 
-    h1 {
-      font-size: 2.1rem;
-      margin: 4px 0 8px;
-      letter-spacing: -0.02em;
-    }
+    .brand { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 6px; }
+    .brand-left { display: flex; align-items: center; gap: 10px; }
+    .brand-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--yellow); }
+    .brand-name { font-size: 0.78rem; letter-spacing: 0.14em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+    .quota-pill { font-size: 0.72rem; color: var(--muted); border: 1px solid var(--border); border-radius: 6px; padding: 4px 10px; }
+
+    h1 { font-size: 2rem; margin: 4px 0 8px; letter-spacing: -0.02em; }
     h1 span { color: var(--yellow); }
+    p.subtitle { color: var(--muted); margin: 0 0 28px; font-size: 0.95rem; line-height: 1.55; max-width: 640px; }
 
-    p.subtitle {
-      color: var(--muted);
-      margin: 0 0 32px;
-      font-size: 1rem;
-      line-height: 1.5;
-      max-width: 560px;
-    }
+    .panel { background: var(--panel); border: 1px solid var(--border); border-radius: 10px; padding: 20px; margin-bottom: 16px; animation: fadeIn 0.35s ease; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }
 
-    .panel {
-      background: linear-gradient(180deg, var(--panel), var(--panel-2));
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 20px;
-      margin-bottom: 18px;
-      transition: border-color 0.2s ease;
-    }
-    .panel:hover { border-color: var(--border-hover); }
-
-    .panel-label {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-    }
-    label {
-      font-size: 0.78rem;
-      color: var(--muted);
-      text-transform: uppercase;
-      letter-spacing: 0.08em;
-      font-weight: 600;
-    }
-    .char-count { font-size: 0.75rem; color: var(--muted); }
+    .panel-label { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+    label { font-size: 0.72rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.08em; font-weight: 600; }
+    .char-count { font-size: 0.72rem; color: var(--muted); }
 
     textarea {
-      width: 100%;
-      background: #000;
-      color: var(--text);
-      border: 1px solid var(--border);
-      border-radius: 10px;
-      padding: 14px;
+      width: 100%; background: var(--code-bg); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px; padding: 14px;
       font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace;
-      font-size: 0.9rem;
-      line-height: 1.5;
-      resize: vertical;
-      min-height: 220px;
-      transition: border-color 0.15s ease, box-shadow 0.15s ease;
+      font-size: 0.88rem; line-height: 1.5; resize: vertical; min-height: 220px;
     }
-    textarea:focus {
-      outline: none;
-      border-color: var(--yellow);
-      box-shadow: 0 0 0 3px var(--yellow-soft);
-    }
-    #output {
-      min-height: 180px;
-      white-space: pre-wrap;
-      font-family: "Inter", -apple-system, sans-serif;
-      color: #e8e8e8;
-    }
-    #output::placeholder { color: var(--muted); }
+    textarea:focus { outline: none; border-color: var(--yellow); }
 
-    .actions {
-      display: flex;
-      align-items: center;
-      gap: 14px;
-      margin-top: 14px;
+    /* --- Uniform action buttons: same shape, same color, text-only --- */
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+    button.btn {
+      position: relative; background: var(--panel-2); color: var(--text);
+      border: 1px solid var(--border); border-radius: 8px; padding: 10px 16px;
+      font-weight: 600; font-size: 0.82rem; cursor: pointer; font-family: inherit;
+      transition: border-color 0.12s ease, background 0.12s ease;
     }
-    button {
-      background: var(--yellow);
-      color: #101010;
-      border: none;
-      border-radius: 10px;
-      padding: 12px 22px;
-      font-weight: 700;
-      font-size: 0.9rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 8px;
-      transition: background 0.15s ease, transform 0.1s ease;
+    button.btn:hover:not(:disabled) { border-color: var(--border-hover); background: #1a1a1a; }
+    button.btn.selected { border-color: var(--yellow); background: var(--yellow-soft); }
+    button.btn:disabled { opacity: 0.45; cursor: not-allowed; }
+    button.btn .ai-tag {
+      position: absolute; top: -7px; right: -7px; background: var(--yellow); color: #101010;
+      font-size: 0.58rem; font-weight: 800; padding: 1px 5px; border-radius: 999px;
     }
-    button:hover:not(:disabled) { background: var(--yellow-hover); transform: translateY(-1px); }
-    button:active:not(:disabled) { transform: translateY(0); }
-    button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
-
-    .spinner {
-      width: 14px;
-      height: 14px;
-      border: 2px solid rgba(16,16,16,0.3);
-      border-top-color: #101010;
-      border-radius: 50%;
-      animation: spin 0.7s linear infinite;
-      display: none;
+    button.btn.loading { color: transparent; }
+    button.btn .spinner {
+      display: none; position: absolute; left: 50%; top: 50%; width: 13px; height: 13px;
+      margin: -7px 0 0 -7px; border: 2px solid var(--border); border-top-color: var(--text);
+      border-radius: 50%; animation: spin 0.7s linear infinite;
     }
-    button.loading .spinner { display: inline-block; }
-    button.loading .btn-text { display: none; }
+    button.btn.loading .spinner { display: block; }
     @keyframes spin { to { transform: rotate(360deg); } }
 
-    .status {
-      font-size: 0.85rem;
-      color: var(--muted);
-      transition: color 0.15s ease;
-    }
+    .status { font-size: 0.82rem; color: var(--muted); margin-top: 10px; min-height: 1.2em; }
     .status.error { color: var(--error); }
-    .status.ok { color: var(--yellow); }
+    .status.ok { color: var(--green); }
 
-    .hint {
-      font-size: 0.78rem;
-      color: var(--muted);
-      margin-top: 20px;
-      text-align: center;
+    /* --- Result tabs: persist every analysis you've run, switch instantly --- */
+    .tab-bar { display: flex; flex-wrap: wrap; gap: 4px; margin-bottom: -1px; position: relative; z-index: 1; }
+    .tab-btn {
+      background: var(--panel-2); color: var(--muted); border: 1px solid var(--border);
+      border-bottom: none; border-radius: 8px 8px 0 0; padding: 8px 14px;
+      font-size: 0.78rem; font-weight: 600; cursor: pointer; font-family: inherit;
     }
+    .tab-btn.active { color: var(--text); background: var(--panel); border-color: var(--border-hover); }
+    .tab-btn .count { color: var(--muted); font-weight: 400; }
+
+    .output-panel { min-height: 160px; }
+    .output-empty { color: var(--muted); font-size: 0.88rem; padding: 26px 0; text-align: center; }
+    #explanationOut { white-space: pre-wrap; color: #e5e5e5; line-height: 1.65; font-size: 0.92rem; }
+
+    /* --- Flowchart (custom SVG, no external library) --- */
+    #flowchartOut { overflow-x: auto; background: var(--code-bg); border: 1px solid var(--border); border-radius: 8px; padding: 18px; }
+    #flowchartOut svg { display: block; margin: 0 auto; }
+    .flowchart-meta { font-size: 0.75rem; color: var(--muted); margin-top: 10px; }
+    @keyframes fcFadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+    .fc-node, .fc-edge, .fc-edge-label { opacity: 0; animation: fcFadeIn 0.4s ease forwards; }
+
+    /* --- item cards (issues / optimizations) --- */
+    .item-card { border: 1px solid var(--border); border-radius: 8px; padding: 14px 16px; margin-bottom: 10px; background: var(--code-bg); opacity: 0; animation: fadeIn 0.3s ease forwards; }
+    .item-head { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; flex-wrap: wrap; }
+    .badge { font-size: 0.64rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; padding: 2px 7px; border-radius: 4px; border: 1px solid currentColor; }
+    .badge.warning { color: var(--warn); }
+    .badge.info { color: var(--info); }
+    .badge.error { color: var(--error); }
+    .item-line { font-size: 0.75rem; color: var(--muted); font-family: monospace; }
+    .item-title { font-size: 0.88rem; font-weight: 700; color: var(--text); }
+    .item-msg { font-size: 0.85rem; color: #ccc; line-height: 1.55; margin-bottom: 8px; }
+    .clean-msg { color: var(--green); font-size: 0.88rem; }
+
+    details.fix-block { margin-top: 8px; }
+    details.fix-block summary { cursor: pointer; font-size: 0.76rem; color: var(--yellow); font-weight: 600; list-style: none; }
+    details.fix-block summary::-webkit-details-marker { display: none; }
+    details.fix-block summary::before { content: "\203A "; }
+    details.fix-block[open] summary::before { content: "\2304 "; }
+    details.fix-block pre { margin: 8px 0 0; background: #050505; border: 1px solid var(--border); border-radius: 6px; padding: 10px 12px; font-size: 0.8rem; font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace; color: #d6d6d6; overflow-x: auto; }
+
+    /* severity summary bar (Issues panel) */
+    .severity-bar { display: flex; height: 8px; border-radius: 4px; overflow: hidden; background: var(--code-bg); margin-bottom: 10px; }
+    .severity-bar > div { height: 100%; transition: width 0.6s ease; }
+    .seg-warning { background: var(--warn); }
+    .seg-info { background: var(--info); }
+    .seg-error { background: var(--error); }
+    .severity-legend { display: flex; gap: 16px; margin-bottom: 16px; font-size: 0.78rem; color: var(--muted); }
+    .severity-legend .dot { display: inline-block; width: 7px; height: 7px; border-radius: 50%; margin-right: 5px; }
+    .dot-warning { background: var(--warn); }
+    .dot-info { background: var(--info); }
+    .dot-error { background: var(--error); }
+
+    /* complexity bar chart */
+    .cc-chart { margin-bottom: 20px; display: flex; flex-direction: column; gap: 8px; }
+    .cc-row { display: grid; grid-template-columns: 140px 1fr 28px; align-items: center; gap: 10px; opacity: 0; animation: fadeIn 0.3s ease forwards; }
+    .cc-name { font-size: 0.8rem; color: #ddd; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .cc-track { background: var(--code-bg); border-radius: 4px; height: 10px; overflow: hidden; }
+    .cc-fill { height: 100%; border-radius: 4px; transition: width 0.7s ease; }
+    .cc-fill.rating-simple { background: var(--green); }
+    .cc-fill.rating-moderate { background: var(--info); }
+    .cc-fill.rating-complex { background: var(--warn); }
+    .cc-fill.rating-very-complex { background: var(--error); }
+    .cc-value { font-size: 0.78rem; color: var(--muted); text-align: right; }
+
+    table.complexity-table { width: 100%; border-collapse: collapse; font-size: 0.84rem; margin-top: 20px; }
+    table.complexity-table th, table.complexity-table td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--border); }
+    table.complexity-table th { color: var(--muted); font-weight: 600; text-transform: uppercase; font-size: 0.68rem; letter-spacing: 0.06em; }
+    table.complexity-table tbody tr { opacity: 0; animation: fadeIn 0.3s ease forwards; }
+    .rating-pill { display: inline-block; padding: 2px 7px; border-radius: 4px; font-size: 0.7rem; font-weight: 700; border: 1px solid currentColor; }
+    .rating-simple { color: var(--green); }
+    .rating-moderate { color: var(--info); }
+    .rating-complex { color: var(--warn); }
+    .rating-very-complex { color: var(--error); }
+
+    /* growth chart */
+    .growth-chart-wrap { border: 1px solid var(--border); border-radius: 8px; padding: 16px; background: var(--code-bg); margin-bottom: 20px; }
+    .growth-caption { font-size: 0.78rem; color: var(--muted); margin-top: 8px; }
+    .growth-caption strong { color: var(--yellow); }
+    .growth-legend { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; font-size: 0.72rem; color: var(--muted); }
+    .growth-legend .dot { display: inline-block; width: 16px; height: 2px; margin-right: 5px; vertical-align: middle; }
+
+    /* line-by-line split view */
+    .lbl-row { display: grid; grid-template-columns: 44px 1fr 1fr; gap: 12px; align-items: start; padding: 7px 0; border-bottom: 1px solid var(--border); opacity: 0; animation: fadeIn 0.25s ease forwards; }
+    .lbl-line-no { font-family: monospace; font-size: 0.74rem; color: var(--muted); text-align: right; padding-top: 2px; }
+    .lbl-code { font-family: "SF Mono", "Fira Code", Menlo, Consolas, monospace; font-size: 0.82rem; color: #d6d6d6; background: var(--code-bg); border-radius: 5px; padding: 4px 8px; overflow-x: auto; white-space: pre; }
+    .lbl-explanation { font-size: 0.83rem; color: #bbb; line-height: 1.5; padding-top: 3px; }
+    .lbl-head { display: grid; grid-template-columns: 44px 1fr 1fr; gap: 12px; padding: 0 0 8px; }
+    .lbl-head label { margin: 0; }
+
+    /* resources tab */
+    .resource-item { border: 1px solid var(--border); border-radius: 8px; padding: 12px 14px; margin-bottom: 8px; background: var(--code-bg); opacity: 0; animation: fadeIn 0.3s ease forwards; }
+    .resource-item a { color: var(--info); text-decoration: none; font-size: 0.86rem; font-weight: 600; }
+    .resource-item a:hover { text-decoration: underline; }
+    .resource-item .resource-cat { font-size: 0.72rem; color: var(--muted); margin-top: 3px; text-transform: uppercase; letter-spacing: 0.04em; }
+
+    .hint { font-size: 0.76rem; color: var(--muted); margin-top: 18px; text-align: center; }
+    .hint code { color: var(--green); }
   </style>
 </head>
 <body>
   <div class="container">
     <div class="brand">
-      <span class="brand-dot"></span>
-      <span class="brand-name">Pythonic</span>
+      <div class="brand-left">
+        <span class="brand-dot"></span>
+        <span class="brand-name">Pythonic</span>
+      </div>
+      <div class="quota-pill" id="quotaText">checking API quota…</div>
     </div>
     <h1>Paste code. Get it <span>explained.</span></h1>
     <p class="subtitle">
-      Drop in any Python snippet and get a plain-English walkthrough —
-      no jargon, no guesswork, just what your code is actually doing.
+      Flowchart, Find issues, Complexity, Optimize and Line by line all run locally
+      and are free to use as often as you like. Explain it is the only button that calls the AI API.
     </p>
 
     <div class="panel">
@@ -192,92 +211,481 @@
         <span class="char-count" id="charCount">0 / 8000</span>
       </div>
       <textarea id="codeInput" placeholder="def add(a, b):&#10;    return a + b" spellcheck="false"></textarea>
+
       <div class="actions">
-        <button id="explainBtn" onclick="explainCode()">
-          <span class="spinner"></span>
-          <span class="btn-text">Explain it</span>
+        <button class="btn" id="explainBtn" onclick="runAction('explain')">
+          <span class="ai-tag">AI</span><span class="spinner"></span><span class="btn-text">Explain it</span>
         </button>
-        <span id="status" class="status"></span>
+        <button class="btn" id="flowchartBtn" onclick="runAction('flowchart')">
+          <span class="spinner"></span><span class="btn-text">Flowchart</span>
+        </button>
+        <button class="btn" id="linebylineBtn" onclick="runAction('linebyline')">
+          <span class="spinner"></span><span class="btn-text">Line by line</span>
+        </button>
+        <button class="btn" id="issuesBtn" onclick="runAction('issues')">
+          <span class="spinner"></span><span class="btn-text">Find issues</span>
+        </button>
+        <button class="btn" id="complexityBtn" onclick="runAction('complexity')">
+          <span class="spinner"></span><span class="btn-text">Complexity</span>
+        </button>
+        <button class="btn" id="optimizeBtn" onclick="runAction('optimize')">
+          <span class="spinner"></span><span class="btn-text">Optimize</span>
+        </button>
+      </div>
+      <div id="status" class="status"></div>
+    </div>
+
+    <div class="tab-bar" id="tabBar"></div>
+    <div class="panel" style="border-top-left-radius:0">
+      <div class="output-panel" id="outputPanel">
+        <div class="output-empty">Pick an action above to see results here.</div>
       </div>
     </div>
 
-    <div class="panel">
-      <div class="panel-label">
-        <label for="output">Explanation</label>
-      </div>
-      <textarea id="output" readonly placeholder="Your explanation will show up here..."></textarea>
-    </div>
-
-    <p class="hint">Only valid Python is accepted — this keeps things fast and on-topic.</p>
+    <p class="hint">
+      Only <strong>Explain it</strong> (marked <code>AI</code>) calls the API.
+      Everything else runs through a local <code>ast</code>-based analyzer.
+    </p>
   </div>
 
   <script>
     const API_BASE = window.API_BASE_URL || `${window.location.protocol}//${window.location.hostname}:5000`;
     const MAX_LEN = 8000;
 
-    const btn = document.getElementById("explainBtn");
     const status = document.getElementById("status");
-    const output = document.getElementById("output");
     const codeInput = document.getElementById("codeInput");
     const charCount = document.getElementById("charCount");
+    const outputPanel = document.getElementById("outputPanel");
+    const tabBar = document.getElementById("tabBar");
+    const quotaText = document.getElementById("quotaText");
+
+    const buttons = {
+      explain: document.getElementById("explainBtn"),
+      flowchart: document.getElementById("flowchartBtn"),
+      linebyline: document.getElementById("linebylineBtn"),
+      issues: document.getElementById("issuesBtn"),
+      complexity: document.getElementById("complexityBtn"),
+      optimize: document.getElementById("optimizeBtn"),
+    };
+
+    const TAB_ORDER = ["explain", "flowchart", "linebyline", "issues", "complexity", "optimize", "resources"];
+    const TAB_LABELS = {
+      explain: "Explanation", flowchart: "Flowchart", linebyline: "Line by line",
+      issues: "Issues", complexity: "Complexity", optimize: "Optimize", resources: "Resources",
+    };
+    const ENDPOINTS = {
+      explain: "/explain", flowchart: "/flowchart", linebyline: "/explain-local",
+      issues: "/issues", complexity: "/complexity", optimize: "/optimize",
+    };
+
+    const resultsCache = {};   // key -> data returned from backend
+    let activeTab = null;
 
     codeInput.addEventListener("input", () => {
       const len = codeInput.value.length;
       charCount.textContent = `${len} / ${MAX_LEN}`;
-      charCount.style.color = len > MAX_LEN ? "#ff6b6b" : "";
+      charCount.style.color = len > MAX_LEN ? "var(--error)" : "";
     });
 
-    async function explainCode() {
-      const code = codeInput.value.trim();
-      output.value = "";
-      status.textContent = "";
-      status.classList.remove("error", "ok");
+    async function refreshQuota() {
+      try {
+        const res = await fetch(`${API_BASE}/health`);
+        const data = await res.json();
+        quotaText.textContent = data.groq_enabled
+          ? `${data.daily_quota_remaining} AI explains left today`
+          : "AI explain disabled — local features still work";
+      } catch { quotaText.textContent = "Backend unreachable"; }
+    }
+    refreshQuota();
 
-      if (!code) {
-        status.textContent = "Paste some code first.";
-        status.classList.add("error");
+    function setLoading(key, isLoading) {
+      const btn = buttons[key];
+      btn.disabled = isLoading;
+      btn.classList.toggle("loading", isLoading);
+    }
+    function setStatus(text, kind) {
+      status.textContent = text;
+      status.classList.remove("error", "ok");
+      if (kind) status.classList.add(kind);
+    }
+    function escapeHtml(str) {
+      const div = document.createElement("div");
+      div.textContent = str == null ? "" : String(str);
+      return div.innerHTML;
+    }
+
+    async function runAction(key) {
+      const code = codeInput.value.trim();
+      if (!code) { setStatus("Paste some code first.", "error"); return; }
+
+      // if already cached for this exact code, just switch tabs — no re-fetch
+      if (resultsCache[key] && resultsCache[key].__code === code) {
+        setActiveTab(key);
         return;
       }
 
-      btn.disabled = true;
-      btn.classList.add("loading");
-      status.textContent = "Reading through it...";
+      setLoading(key, true);
+      setStatus(key === "explain" ? "Asking the AI…" : "Analyzing locally…");
+      Object.values(buttons).forEach(b => b.classList.remove("selected"));
+      buttons[key].classList.add("selected");
 
       try {
-        const response = await fetch(`${API_BASE}/explain`, {
+        const response = await fetch(`${API_BASE}${ENDPOINTS[key]}`, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ code })
+          body: JSON.stringify({ code }),
         });
-
         const data = await response.json();
 
         if (!response.ok) {
-          if (response.status === 422) {
-            status.textContent = data.error || "That doesn't look like valid Python.";
-          } else if (response.status === 429) {
-            status.textContent = data.error || "Slow down a little — rate limit reached.";
-          } else {
-            status.textContent = data.error || `Something went wrong (${response.status}).`;
-          }
-          status.classList.add("error");
+          setStatus(data.error || `Something went wrong (${response.status}).`, "error");
           return;
         }
 
-        output.value = data.explanation || "No explanation returned.";
-        status.textContent = "Done.";
-        status.classList.add("ok");
+        data.__code = code;
+        resultsCache[key] = data;
+        rebuildResourcesTab();
+        setActiveTab(key);
+        setStatus("Done.", "ok");
+        if (key === "explain") refreshQuota();
       } catch (err) {
-        status.textContent = "Couldn't reach the backend: " + err.message;
-        status.classList.add("error");
+        setStatus("Couldn't reach the backend: " + err.message, "error");
       } finally {
-        btn.disabled = false;
-        btn.classList.remove("loading");
+        setLoading(key, false);
       }
     }
 
+    // Aggregate every unique fix/link resource across Issues + Optimize
+    // into its own tab, instead of repeating "Learn more" on every card.
+    function rebuildResourcesTab() {
+      const items = [];
+      const seen = new Set();
+      ["issues", "optimize"].forEach(k => {
+        const data = resultsCache[k];
+        if (!data) return;
+        const list = data.issues || data.suggestions || [];
+        list.forEach(item => {
+          (item.learn_more || []).forEach(l => {
+            if (seen.has(l.url)) return;
+            seen.add(l.url);
+            items.push({ ...l, category: item.category || "" });
+          });
+        });
+      });
+      if (items.length) resultsCache.resources = { items, __code: resultsCache.issues?.__code || resultsCache.optimize?.__code };
+      else delete resultsCache.resources;
+    }
+
+    function setActiveTab(key) {
+      activeTab = key;
+      tabBar.innerHTML = TAB_ORDER.filter(k => resultsCache[k]).map(k => `
+        <button class="tab-btn ${k === key ? "active" : ""}" data-tab="${k}">${TAB_LABELS[k]}</button>
+      `).join("");
+      tabBar.querySelectorAll(".tab-btn").forEach(b => {
+        b.addEventListener("click", () => { setActiveTab(b.dataset.tab); });
+      });
+      Object.entries(buttons).forEach(([k, b]) => b.classList.toggle("selected", k === key));
+      renderTab(key);
+    }
+
+    function renderTab(key) {
+      const data = resultsCache[key];
+      if (!data) { outputPanel.innerHTML = `<div class="output-empty">Pick an action above to see results here.</div>`; return; }
+      RENDERERS[key](data);
+    }
+
+    function fixBlockHtml(item) {
+      if (!item.fix) return "";
+      return `<details class="fix-block"><summary>Suggested fix</summary><pre>${escapeHtml(item.fix)}</pre></details>`;
+    }
+
+    // ============================================================
+    // Custom SVG flowchart renderer — no external diagram library.
+    // Consumes {nodes:[{id,shape,label,row,col}], edges:[{from,to,label}]}
+    // ============================================================
+    function renderFlowchartSVG(graph) {
+      const ROW_H = 80, COL_W = 220, MARGIN = 30;
+      const byId = {};
+      graph.nodes.forEach(n => byId[n.id] = n);
+
+      function estWidth(label, shape) {
+        const base = Math.max(6, label.length) * 6.4;
+        if (shape === "decision") return Math.min(210, Math.max(160, base * 1.6));
+        if (shape === "merge") return 8;
+        return Math.min(190, Math.max(96, base + 26));
+      }
+      function heightFor(shape) {
+        if (shape === "decision") return 66;
+        if (shape === "merge") return 8;
+        return 40;
+      }
+
+      const maxCol = Math.max(0, ...graph.nodes.map(n => n.col));
+      const maxRow = Math.max(1, ...graph.nodes.map(n => n.row));
+
+      graph.nodes.forEach(n => {
+        n.w = estWidth(n.label, n.shape);
+        n.h = heightFor(n.shape);
+        const slotX = MARGIN + n.col * COL_W;
+        n.cx = slotX + COL_W / 2;
+        n.cy = MARGIN + (n.row - 1) * ROW_H + n.h / 2;
+      });
+
+      const svgW = MARGIN * 2 + (maxCol + 1) * COL_W;
+      const svgH = MARGIN * 2 + maxRow * ROW_H + 20;
+
+      let defs = `<defs><marker id="fcArrow" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#6b6b6b"/></marker></defs>`;
+
+      let edgesSvg = "";
+      graph.edges.forEach((e, i) => {
+        const a = byId[e.from], b = byId[e.to];
+        if (!a || !b) return;
+        const startY = a.cy + a.h / 2;
+        const endY = b.cy - b.h / 2;
+        const midY = (startY + endY) / 2;
+        const path = `M ${a.cx} ${startY} L ${a.cx} ${midY} L ${b.cx} ${midY} L ${b.cx} ${Math.max(endY, midY)}`;
+        edgesSvg += `<path class="fc-edge" d="${path}" fill="none" stroke="#3a3a3a" stroke-width="1.5" marker-end="url(#fcArrow)" style="animation-delay:${i * 25}ms" />`;
+        if (e.label) {
+          const lx = (a.cx + b.cx) / 2;
+          const ly = midY;
+          const lw = Math.max(30, e.label.length * 6 + 10);
+          edgesSvg += `<g class="fc-edge-label" style="animation-delay:${i * 25}ms">
+            <rect x="${lx - lw / 2}" y="${ly - 9}" width="${lw}" height="16" rx="4" fill="#000"/>
+            <text x="${lx}" y="${ly + 3}" text-anchor="middle" font-size="9.5" fill="#9a9a9a">${escapeHtml(e.label)}</text>
+          </g>`;
+        }
+      });
+
+      let nodesSvg = "";
+      graph.nodes.forEach(n => {
+        const delay = (n.row - 1) * 55;
+        if (n.shape === "merge") {
+          nodesSvg += `<circle class="fc-node" cx="${n.cx}" cy="${n.cy}" r="3" fill="#454545" style="animation-delay:${delay}ms"/>`;
+          return;
+        }
+        const x = n.cx - n.w / 2, y = n.cy - n.h / 2;
+        let shapeSvg, textColor;
+        if (n.shape === "decision") {
+          const pts = `${n.cx},${y} ${x + n.w},${n.cy} ${n.cx},${y + n.h} ${x},${n.cy}`;
+          shapeSvg = `<polygon points="${pts}" fill="#0e0e0e" stroke="#5b9bff" stroke-width="1.3"/>`;
+          textColor = "#5b9bff";
+        } else if (n.shape === "start" || n.shape === "terminal") {
+          shapeSvg = `<rect x="${x}" y="${y}" width="${n.w}" height="${n.h}" rx="${n.h / 2}" ry="${n.h / 2}" fill="#0e0e0e" stroke="#f5c518" stroke-width="1.3"/>`;
+          textColor = "#f5c518";
+        } else {
+          shapeSvg = `<rect x="${x}" y="${y}" width="${n.w}" height="${n.h}" rx="7" ry="7" fill="#0e0e0e" stroke="#454545" stroke-width="1.3"/>`;
+          textColor = "#dddddd";
+        }
+        nodesSvg += `<g class="fc-node" style="animation-delay:${delay}ms">${shapeSvg}<text x="${n.cx}" y="${n.cy}" text-anchor="middle" dominant-baseline="middle" font-size="10.5" fill="${textColor}">${escapeHtml(n.label)}</text></g>`;
+      });
+
+      return `<svg viewBox="0 0 ${svgW} ${svgH}" width="${svgW}" height="${svgH}" xmlns="http://www.w3.org/2000/svg" font-family="Inter, sans-serif">${defs}${edgesSvg}${nodesSvg}</svg>`;
+    }
+
+    // ============================================================
+    // Time-complexity growth chart — pure math, no backend call.
+    // Draws O(1)/O(n)/O(n log n)/O(n²)/O(n³)/O(2ⁿ) curves and
+    // highlights whichever class matches the worst function found.
+    // ============================================================
+    const GROWTH_CURVES = {
+      const:  { fn: () => 1,                         color: "#33c17f", label: "O(1)" },
+      n:      { fn: n => n,                           color: "#5b9bff", label: "O(n)" },
+      nlogn:  { fn: n => n * Math.log2(n || 1),        color: "#8a8a8a", label: "O(n log n)" },
+      n2:     { fn: n => n * n,                        color: "#f5a524", label: "O(n\u00b2)" },
+      n3:     { fn: n => n * n * n,                    color: "#e8743b", label: "O(n\u00b3)" },
+      exp:    { fn: n => Math.pow(2, n),               color: "#ff6b6b", label: "O(2\u207f)" },
+    };
+    const GROWTH_ORDER = ["const", "n", "nlogn", "n2", "n3", "exp"];
+
+    function classifyBigO(text) {
+      if (/2\^n|exponential/i.test(text)) return "exp";
+      if (/n\^3|n.?\u00b3/i.test(text)) return "n3";
+      if (/n\^2|n.?\u00b2/i.test(text)) return "n2";
+      if (/log/i.test(text)) return "nlogn";
+      if (/O\(n\)/i.test(text)) return "n";
+      if (/O\(1\)/i.test(text)) return "const";
+      return "n";
+    }
+
+    function renderGrowthChart(rows) {
+      if (!rows.length) return "";
+      let worstKey = "const", worstName = rows[0].name;
+      rows.forEach(r => {
+        const k = classifyBigO(r.big_o);
+        if (GROWTH_ORDER.indexOf(k) > GROWTH_ORDER.indexOf(worstKey)) { worstKey = k; worstName = r.name; }
+      });
+
+      const W = 560, H = 200, PAD = 30, N_MAX = 10;
+      const maxVal = Math.log2(GROWTH_CURVES.exp.fn(N_MAX) + 1);
+      const xFor = n => PAD + ((n - 1) / (N_MAX - 1)) * (W - PAD * 2);
+      const yFor = v => H - PAD - (Math.log2(v + 1) / maxVal) * (H - PAD * 2);
+
+      let paths = "";
+      let legend = "";
+      GROWTH_ORDER.forEach(key => {
+        const curve = GROWTH_CURVES[key];
+        const isWorst = key === worstKey;
+        let d = "";
+        for (let n = 1; n <= N_MAX; n++) {
+          const x = xFor(n), y = yFor(curve.fn(n));
+          d += (n === 1 ? "M" : "L") + x.toFixed(1) + " " + y.toFixed(1) + " ";
+        }
+        paths += `<path d="${d}" fill="none" stroke="${curve.color}" stroke-width="${isWorst ? 2.6 : 1.2}" opacity="${isWorst ? 1 : 0.35}"/>`;
+        legend += `<span><i class="dot" style="background:${curve.color}"></i>${curve.label}${isWorst ? " (yours)" : ""}</span>`;
+      });
+
+      const svg = `<svg viewBox="0 0 ${W} ${H}" width="100%" height="${H}" xmlns="http://www.w3.org/2000/svg">
+        <line x1="${PAD}" y1="${H - PAD}" x2="${W - PAD}" y2="${H - PAD}" stroke="#262626"/>
+        <line x1="${PAD}" y1="${PAD}" x2="${PAD}" y2="${H - PAD}" stroke="#262626"/>
+        <text x="${PAD}" y="${H - 8}" font-size="9" fill="#666">small input</text>
+        <text x="${W - PAD - 55}" y="${H - 8}" font-size="9" fill="#666">large input</text>
+        ${paths}
+      </svg>`;
+
+      return `<div class="growth-chart-wrap">${svg}
+        <div class="growth-caption">Your worst-case function is <strong>${escapeHtml(worstName)}</strong> — this chart shows roughly how its work grows as input size increases, next to the other common complexity classes.</div>
+        <div class="growth-legend">${legend}</div>
+      </div>`;
+    }
+
+    // ============================================================
+    // Per-tab renderers
+    // ============================================================
+    const RENDERERS = {
+      explain(data) {
+        outputPanel.innerHTML = `<div id="explanationOut"></div>`;
+        document.getElementById("explanationOut").textContent = data.explanation || "No explanation returned.";
+      },
+
+      flowchart(data) {
+        if (!data.nodes || !data.nodes.length) {
+          outputPanel.innerHTML = `<div class="output-empty">No statements to diagram.</div>`;
+          return;
+        }
+        const svg = renderFlowchartSVG(data);
+        outputPanel.innerHTML = `<div id="flowchartOut">${svg}</div>
+          <div class="flowchart-meta">Control flow for <strong>${escapeHtml(data.function_analyzed || "module")}</strong>${data.truncated ? " (truncated — large function)" : ""}</div>`;
+      },
+
+      linebyline(data) {
+        const lines = data.lines || [];
+        if (!lines.length) {
+          outputPanel.innerHTML = `<div class="output-empty">No statements to walk through.</div>`;
+          return;
+        }
+        outputPanel.innerHTML = `
+          <div class="lbl-head"><label>Line</label><label>Code</label><label>What it does</label></div>
+          ${lines.map((l, idx) => `
+            <div class="lbl-row" style="animation-delay:${idx * 25}ms">
+              <div class="lbl-line-no">${l.line ?? ""}</div>
+              <div class="lbl-code" style="margin-left:${l.depth * 14}px">${escapeHtml(l.code)}</div>
+              <div class="lbl-explanation">${escapeHtml(l.explanation)}</div>
+            </div>
+          `).join("")}
+          <div class="flowchart-meta">Walking through <strong>${escapeHtml(data.function_analyzed || "module")}</strong>${data.truncated ? " — truncated, showing the first statements" : ""}</div>
+        `;
+      },
+
+      issues(data) {
+        const issues = data.issues || [];
+        if (issues.length === 0) {
+          outputPanel.innerHTML = `<div class="clean-msg">No common issues detected. Looks clean.</div>`;
+          return;
+        }
+        const counts = { warning: 0, info: 0, error: 0 };
+        issues.forEach(i => { if (counts[i.severity] !== undefined) counts[i.severity]++; });
+        const total = issues.length;
+        const segClass = { warning: "seg-warning", info: "seg-info", error: "seg-error" };
+        const segments = Object.entries(counts).filter(([, n]) => n > 0)
+          .map(([sev, n]) => `<div class="${segClass[sev]}" style="width:${(n / total) * 100}%"></div>`).join("");
+
+        outputPanel.innerHTML = `
+          <div class="severity-bar">${segments}</div>
+          <div class="severity-legend">
+            ${counts.warning ? `<span><i class="dot dot-warning"></i>${counts.warning} warning${counts.warning > 1 ? "s" : ""}</span>` : ""}
+            ${counts.info ? `<span><i class="dot dot-info"></i>${counts.info} info</span>` : ""}
+            ${counts.error ? `<span><i class="dot dot-error"></i>${counts.error} error${counts.error > 1 ? "s" : ""}</span>` : ""}
+          </div>
+          ${issues.map((i, idx) => `
+            <div class="item-card" style="animation-delay:${idx * 40}ms">
+              <div class="item-head">
+                <span class="badge ${i.severity}">${escapeHtml(i.severity)}</span>
+                <span class="item-line">line ${i.line} \u00b7 ${escapeHtml(i.category)}</span>
+              </div>
+              <div class="item-msg">${escapeHtml(i.message)}</div>
+              ${fixBlockHtml(i)}
+            </div>
+          `).join("")}
+        `;
+      },
+
+      complexity(data) {
+        const rows = data.complexity || [];
+        if (rows.length === 0) {
+          outputPanel.innerHTML = `<div class="output-empty">No functions found to analyze.</div>`;
+          return;
+        }
+        const ratingClass = r => "rating-" + r.split(" ")[0].replace(/[^a-z]/gi, "");
+        const maxCC = Math.max(...rows.map(r => r.cyclomatic_complexity), 1);
+        outputPanel.innerHTML = `
+          ${renderGrowthChart(rows)}
+          <div class="cc-chart">
+            ${rows.map((r, idx) => `
+              <div class="cc-row" style="animation-delay:${idx * 50}ms">
+                <span class="cc-name">${escapeHtml(r.name)}</span>
+                <div class="cc-track"><div class="cc-fill ${ratingClass(r.rating)}" style="width:${(r.cyclomatic_complexity / maxCC) * 100}%"></div></div>
+                <span class="cc-value">${r.cyclomatic_complexity}</span>
+              </div>
+            `).join("")}
+          </div>
+          <table class="complexity-table">
+            <thead><tr><th>Function</th><th>Lines</th><th>Cyclomatic</th><th>Rating</th><th>Big-O estimate</th></tr></thead>
+            <tbody>
+              ${rows.map((r, idx) => `
+                <tr style="animation-delay:${idx * 40}ms">
+                  <td>${escapeHtml(r.name)} <span style="color:var(--muted)">(L${r.line})</span></td>
+                  <td>${r.lines}</td>
+                  <td>${r.cyclomatic_complexity}</td>
+                  <td><span class="rating-pill ${ratingClass(r.rating)}">${escapeHtml(r.rating)}</span></td>
+                  <td style="color:#ccc">${escapeHtml(r.big_o)}</td>
+                </tr>
+              `).join("")}
+            </tbody>
+          </table>`;
+      },
+
+      optimize(data) {
+        const suggestions = data.suggestions || [];
+        if (suggestions.length === 0) {
+          outputPanel.innerHTML = `<div class="clean-msg">No obvious optimizations spotted — looks efficient.</div>`;
+          return;
+        }
+        outputPanel.innerHTML = suggestions.map((s, idx) => `
+          <div class="item-card" style="animation-delay:${idx * 40}ms">
+            <div class="item-title">${escapeHtml(s.title)} <span style="color:var(--muted);font-weight:400">\u00b7 line ${s.line}</span></div>
+            <div class="item-msg">${escapeHtml(s.detail)}</div>
+            ${fixBlockHtml(s)}
+          </div>
+        `).join("");
+      },
+
+      resources(data) {
+        const items = data.items || [];
+        if (!items.length) {
+          outputPanel.innerHTML = `<div class="output-empty">Run Find issues or Optimize to collect reference links here.</div>`;
+          return;
+        }
+        outputPanel.innerHTML = items.map((l, idx) => `
+          <div class="resource-item" style="animation-delay:${idx * 40}ms">
+            <a href="${encodeURI(l.url)}" target="_blank" rel="noopener">${escapeHtml(l.title)} \u2197</a>
+            <div class="resource-cat">${escapeHtml(l.category)}</div>
+          </div>
+        `).join("");
+      },
+    };
+
     codeInput.addEventListener("keydown", (e) => {
-      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") explainCode();
+      if ((e.metaKey || e.ctrlKey) && e.key === "Enter") runAction("explain");
     });
   </script>
 </body>
